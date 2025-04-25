@@ -4,7 +4,7 @@ This repository is the official implementation of the paper “[Flexible Job Sho
 
 ## Quick Start
 
-### requirements
+### Requirements
 
 - python $=$ 3.7.11
 - argparse $=$ 1.4.0
@@ -16,7 +16,7 @@ This repository is the official implementation of the paper “[Flexible Job Sho
 - torchvision $=$ 0.12.0+cu113
 - tqdm $=$ 4.64.0
 
-### introduction
+### Introduction
 
 - `data` saves the instance files including testing instances (in the subfolder `BenchData`, `SD1` and `SD2`) and validation instances (in the subfolder `data_train_vali`) .
 - `model` contains the implementation of the proposed framework.
@@ -34,53 +34,54 @@ This repository is the official implementation of the paper “[Flexible Job Sho
 - `test_trained_model.py` is used for evaluating the models.
 - `train.py` is used for training.
 
-### train
+### Train
 
 ```python
 python train.py # train the model on 10x5 FJSP instances using SD2
 
 # options (Validation instances of corresponding size should be prepared in ./data/data_train_vali/{data_source})
-python train.py 	--n_j 10		# number of jobs for training/validation instances
-			--n_m 5			# number of machines for training/validation instances
-    			--data_source SD2	# data source (SD1 / SD2)
-        		--data_suffix mix	# mode for SD2 data generation
-            					# 'mix' is thedefault mode as defined in the paper
-                				# 'nf' means 'no flexibility' (generating JSP data) 
-        		--model_suffix demo	# annotations for the model
+python train.py     --n_j 10             # number of jobs for training/validation instances
+                    --n_m 5              # number of machines for training/validation instances
+                    --data_source SD2    # data source (SD1 / SD2)
+                    --data_suffix mix    # mode for SD2 data generation
+                                         # 'mix' is the default mode as defined in the paper
+                                         # 'nf' means 'no flexibility' (generating JSP data) 
+                    --model_suffix demo    # annotations for the model
 ```
 
-### evaluate
+### Evaluate
 
 ```python
 python test_trained_model.py # evaluate the model trained on '10x5+mix' of SD2 using the testing instances of the same size using the greedy strategy
 
 # options (Model files should be prepared in ./trained_network/{model_source})
-python test_trained_model.py 	--data_source SD2	# source of testing instances
-				--model_source SD2	# source of instances that the model trained on 
-    				--test_data 10x5+mix	# list of instance names for testing
-        			--test_model 10x5+mix	# list of model names for testing
-            			--test_mode False	# whether using the sampling strategy
-                		--sample_times 100	# set the number of sampling times
+python test_trained_model.py     --data_source SD2     # source of testing instances
+                                 --model_source SD2    # source of instances that the model trained on 
+                                 --test_data 10x5+mix  # list of instance names for testing
+                                 --test_model 10x5+mix # list of model names for testing
+                                 --test_mode False     # whether using the sampling strategy
+                                 --sample_times 100    # set the number of sampling times
 ```
 
 ## Cite the paper
 
-```
-@ARTICLE{10246328,
+```bibTex
+@article{wang2023flexible3306421,
   author={Wang, Runqing and Wang, Gang and Sun, Jian and Deng, Fang and Chen, Jie},
-  journal={IEEE Transactions on Neural Networks and Learning Systems}, 
-  title={Flexible Job Shop Scheduling via Dual Attention Network-Based Reinforcement Learning}, 
+  title   = {Flexible Job Shop Scheduling via Dual Attention Network-Based Reinforcement Learning},
+  journal={IEEE Transactions on Neural Networks and Learning Systems},
+  volume={35},
+  number={3},
+  pages={3091--3102},
   year={2023},
-  volume={},
-  number={},
-  pages={1-12},
-  doi={10.1109/TNNLS.2023.3306421}
+  publisher={IEEE}
+  doi     = {10.1109/TNNLS.2023.3306421}
 }
 ```
 
 ## Reference
 
-- https://github.com/songwenas12/fjsp-drl/
-- https://github.com/zcaicaros/L2D
-- https://github.com/google/or-tools
-- https://github.com/Diego999/pyGAT
+- [https://github.com/songwenas12/fjsp-drl/](https://github.com/songwenas12/fjsp-drl/)
+- [https://github.com/zcaicaros/L2D](https://github.com/zcaicaros/L2D)
+- [https://github.com/google/or-tools](https://github.com/google/or-tools)
+- [https://github.com/Diego999/pyGAT](https://github.com/Diego999/pyGAT)
