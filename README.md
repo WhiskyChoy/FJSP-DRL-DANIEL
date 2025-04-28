@@ -46,7 +46,7 @@ python train.py     --n_j 10             # number of jobs for training/validatio
                     --data_suffix mix    # mode for SD2 data generation
                                          # 'mix' is the default mode as defined in the paper
                                          # 'nf' means 'no flexibility' (generating JSP data) 
-                    --model_suffix demo    # annotations for the model
+                    --model_suffix demo  # annotations for the model
 ```
 
 ### Evaluate
