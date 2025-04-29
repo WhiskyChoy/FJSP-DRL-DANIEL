@@ -265,8 +265,7 @@ class FJSPEnvForVariousOpNums:
             self.incomplete_env_idx, chosen_op]
 
         self.current_makespan[self.incomplete_env_idx] = np.maximum(self.current_makespan[self.incomplete_env_idx],
-                                                                    self.true_op_ct[
-                                                                        self.incomplete_env_idx, chosen_op])
+                                                                    self.true_op_ct[self.incomplete_env_idx, chosen_op])
 
         for k, j in enumerate(self.incomplete_env_idx):
             if candidate_add_flag[k]:
@@ -439,11 +438,9 @@ class FJSPEnvForVariousOpNums:
 
         chosen_op_max_pt = np.expand_dims(self.op_max_pt[self.env_job_idx, self.candidate], axis=-1)
 
-        max_remain_op_pt = np.max(np.max(remain_op_pt, axis=1, keepdims=True), axis=2, keepdims=True) \
-            .filled(0 + 1e-8)
+        max_remain_op_pt = np.max(np.max(remain_op_pt, axis=1, keepdims=True), axis=2, keepdims=True).filled(0 + 1e-8)
 
-        mch_max_remain_op_pt = np.max(remain_op_pt, axis=1, keepdims=True). \
-            filled(0 + 1e-8)
+        mch_max_remain_op_pt = np.max(remain_op_pt, axis=1, keepdims=True).filled(0 + 1e-8)
 
         pair_max_pt = np.max(np.max(self.candidate_pt, axis=1, keepdims=True),
                              axis=2, keepdims=True) + 1e-8

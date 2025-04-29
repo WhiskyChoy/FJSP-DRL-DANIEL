@@ -353,21 +353,16 @@ class FJSPEnvForSameOpNums:
 
         true_chosen_op_st = np.maximum(self.true_candidate_free_time[self.env_idxs, chosen_job],
                                        self.true_mch_free_time[self.env_idxs, chosen_mch])
-        self.true_op_ct[self.env_idxs, chosen_op] = true_chosen_op_st + self.true_op_pt[
-            self.env_idxs, chosen_op, chosen_mch]
-        self.true_candidate_free_time[self.env_idxs, chosen_job] = self.true_op_ct[
-            self.env_idxs, chosen_op]
-        self.true_mch_free_time[self.env_idxs, chosen_mch] = self.true_op_ct[
-            self.env_idxs, chosen_op]
+        self.true_op_ct[self.env_idxs, chosen_op] = true_chosen_op_st + self.true_op_pt[self.env_idxs, chosen_op, chosen_mch]
+        self.true_candidate_free_time[self.env_idxs, chosen_job] = self.true_op_ct[self.env_idxs, chosen_op]
+        self.true_mch_free_time[self.env_idxs, chosen_mch] = self.true_op_ct[self.env_idxs, chosen_op]
 
-        self.current_makespan = np.maximum(self.current_makespan, self.true_op_ct[
-            self.env_idxs, chosen_op])
+        self.current_makespan = np.maximum(self.current_makespan, self.true_op_ct[self.env_idxs, chosen_op])
 
         # update the candidate message
         mask_temp = candidate_add_flag
         self.candidate_pt[mask_temp, chosen_job[mask_temp]] = self.unmasked_op_pt[mask_temp, chosen_op[mask_temp] + 1]
-        self.candidate_process_relation[mask_temp, chosen_job[mask_temp]] = \
-            self.reverse_process_relation[mask_temp, chosen_op[mask_temp] + 1]
+        self.candidate_process_relation[mask_temp, chosen_job[mask_temp]] = self.reverse_process_relation[mask_temp, chosen_op[mask_temp] + 1]
         self.candidate_process_relation[~mask_temp, chosen_job[~mask_temp]] = 1
 
         # compute the next schedule time
@@ -503,8 +498,7 @@ class FJSPEnvForSameOpNums:
 
         std_fea_j = np.sqrt(var_fea_j * self.number_of_ops / num_left_nodes)
 
-        self.fea_j = (temp - mean_fea_j[:, np.newaxis, :]) / \
-                     (std_fea_j[:, np.newaxis, :] + 1e-8)
+        self.fea_j = (temp - mean_fea_j[:, np.newaxis, :]) / (std_fea_j[:, np.newaxis, :] + 1e-8)
 
     def construct_mch_features(self):
         """
@@ -536,8 +530,7 @@ class FJSPEnvForSameOpNums:
         var_fea_m = np.var(temp, axis=1)
         std_fea_m = np.sqrt(var_fea_m * self.number_of_machines / num_left_mchs)
 
-        self.fea_m = (temp - mean_fea_m[:, np.newaxis, :]) / \
-                     (std_fea_m[:, np.newaxis, :] + 1e-8)
+        self.fea_m = (temp - mean_fea_m[:, np.newaxis, :]) / (std_fea_m[:, np.newaxis, :] + 1e-8)
 
     def construct_pair_features(self):
         """
@@ -547,11 +540,9 @@ class FJSPEnvForSameOpNums:
 
         chosen_op_max_pt = np.expand_dims(self.op_max_pt[self.env_job_idx, self.candidate], axis=-1)
 
-        max_remain_op_pt = np.max(np.max(remain_op_pt, axis=1, keepdims=True), axis=2, keepdims=True) \
-            .filled(0 + 1e-8)
+        max_remain_op_pt = np.max(np.max(remain_op_pt, axis=1, keepdims=True), axis=2, keepdims=True).filled(0 + 1e-8)
 
-        mch_max_remain_op_pt = np.max(remain_op_pt, axis=1, keepdims=True). \
-            filled(0 + 1e-8)
+        mch_max_remain_op_pt = np.max(remain_op_pt, axis=1, keepdims=True).filled(0 + 1e-8)
 
         pair_max_pt = np.max(np.max(self.candidate_pt, axis=1, keepdims=True),
                              axis=2, keepdims=True) + 1e-8

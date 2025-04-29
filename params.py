@@ -85,6 +85,7 @@ class MyConfig(argparse.Namespace):
     sample_times: int
     test_model: List[str]
     test_method: List[str]
+    test_greedy_n_times: int = 5
 
 def str2bool(v: str):
     """
@@ -200,6 +201,8 @@ parser.add_argument('--use_sample', type=str2bool, default=False, help='Whether 
 parser.add_argument('--sample_times', type=int, default=100, help='Sampling times for the sampling strategy')
 parser.add_argument('--test_model', nargs='+', default=['10x5+mix'], help='List of model for testing')
 parser.add_argument('--test_method', nargs='+', default=[], help='List of heuristic methods for testing')
+parser.add_argument('--test_greedy_n_times', type=int, default=1,
+                    help='Number of times for testing the greedy method (for each instance)')
 
 configs: MyConfig = parser.parse_args()     # type: ignore
 

@@ -1,5 +1,5 @@
 {
-    "device": "cuda",
+    "device": "cpu",
     "device_id": "0",
     "model_suffix": "",
     "data_suffix": "mix",
@@ -60,12 +60,13 @@
     "reset_env_timestep": 20,
     "minibatch_size": 1024,
     "test_data": [
-        "10x5+mix"
+        "homo_huge"
     ],
-    "test_mode": false,
+    "use_sample": false,
     "sample_times": 100,
     "test_model": [
         "10x5+mix"
     ],
-    "test_method": []
+    "test_method": [],
+    "test_greedy_n_times": 1
 }

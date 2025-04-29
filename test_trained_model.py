@@ -45,10 +45,19 @@ def test_greedy_strategy(data_set: Tuple[List[np.ndarray], List[np.ndarray]],
 
     suffix = '' if idx is None else f'({idx})'
 
-    for i in tqdm(range(len(data_set[0])), file=sys.stdout, desc=f"progress{suffix}", colour='blue'):
+    len_data_set = len(data_set[0])
+    my_range = range(len_data_set)
+    if len_data_set > 1:
+        my_range = tqdm(my_range, file=sys.stdout, desc=f"progress{suffix}", colour='blue')
+
+    for i in my_range:
 
         state = env.set_initial_data([data_set[0][i]], [data_set[1][i]])
         t1 = time.time()
+
+        if len_data_set == 1:
+            inner_tqdm = tqdm(file=sys.stdout, desc=f"inner progress{suffix}", colour='blue', total=env.number_of_ops)
+
         while True:
 
             with torch.no_grad():
@@ -64,6 +73,11 @@ def test_greedy_strategy(data_set: Tuple[List[np.ndarray], List[np.ndarray]],
             action = greedy_select_action(pi)
             # state, reward, done = env.step(actions=action.cpu().numpy())
             state, _, done = env.step(actions=action.cpu().numpy())
+            
+            if len_data_set == 1:
+                inner_tqdm.update(1)
+                inner_tqdm.set_postfix_str(f"makespan: {env.current_makespan[0]}")
+
             if done:
                 break
         t2 = time.time()
@@ -98,13 +112,22 @@ def test_sampling_strategy(data_set: Tuple[List[np.ndarray], List[np.ndarray]],
 
     suffix = '' if idx is None else f'({idx})'
 
-    for i in tqdm(range(len(data_set[0])), file=sys.stdout, desc=f"progress{suffix}", colour='blue'):
+    len_data_set = len(data_set[0])
+    my_range = range(len_data_set)
+    if len_data_set > 1:
+        my_range = tqdm(my_range, file=sys.stdout, desc=f"progress{suffix}", colour='blue')
+
+    for i in my_range:
         # copy the testing environment
         JobLength_dataset = np.tile(np.expand_dims(data_set[0][i], axis=0), (sample_times, 1))
         OpPT_dataset = np.tile(np.expand_dims(data_set[1][i], axis=0), (sample_times, 1, 1))
 
         state = env.set_initial_data(JobLength_dataset, OpPT_dataset)   # type: ignore
         t1 = time.time()
+
+        if len_data_set == 1:
+            inner_tqdm = tqdm(file=sys.stdout, desc=f"inner progress{suffix}", colour='blue', total=env.number_of_ops)
+
         while True:
 
             with torch.no_grad():
@@ -119,6 +142,11 @@ def test_sampling_strategy(data_set: Tuple[List[np.ndarray], List[np.ndarray]],
 
             action_envs, _ = sample_action(pi)
             state, _, done = env.step(action_envs.cpu().numpy())
+
+            if len_data_set == 1:
+                inner_tqdm.update(1)
+                inner_tqdm.set_postfix_str(f"makespan(mean): {env.current_makespan.mean()}")
+
             if done.all():
                 break
 
@@ -146,12 +174,15 @@ def main(config: MyConfig):
         test_model.append((f'./trained_network/{config.model_source}/{model_name}.pth', model_name))
 
     # collect the test data
+    # data_source是一级目录，test_data是二级目录
     test_data = pack_data_from_config(config.data_source, config.test_data)
 
     if flag_sample:
         model_prefix = "DANIELS"
     else:
         model_prefix = "DANIELG"
+
+    test_greedy_n_times = config.test_greedy_n_times
 
     for data in test_data:
         print("-" * 25 + "Test Learned Model" + "-" * 25)
@@ -169,14 +200,15 @@ def main(config: MyConfig):
 
                 if not flag_sample:
                     print("Test mode: Greedy")
-                    result_5_times = []
+                    result_n_times = []
                     # Greedy mode, test 5 times, record average time.
-                    for j in range(5):
-                        result = test_greedy_strategy(data[0], model[0], config.seed_test, j)
-                        result_5_times.append(result)
-                    result_5_times_np = np.array(result_5_times)
+                    for j in range(test_greedy_n_times):
+                        idx = None if test_greedy_n_times == 1 else j
+                        result = test_greedy_strategy(data[0], model[0], config.seed_test, idx)
+                        result_n_times.append(result)
+                    result_n_times_np = np.array(result_n_times)
 
-                    save_result: np.ndarray = np.mean(result_5_times_np, axis=0)
+                    save_result: np.ndarray = np.mean(result_n_times_np, axis=0)
                     print("testing results:")
                     print(f"makespan(greedy): ", save_result[:, 0].mean())
                     print(f"time: ", save_result[:, 1].mean())

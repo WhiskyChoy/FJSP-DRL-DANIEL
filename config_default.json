@@ -67,5 +67,6 @@
     "test_model": [
         "10x5+mix"
     ],
-    "test_method": []
+    "test_method": [],
+    "test_greedy_n_times": 5
 }
