@@ -1,5 +1,89 @@
 import argparse
+from typing import List
 
+
+class MyConfig(argparse.Namespace):
+    # Device configuration
+    device: str
+    device_id: str
+
+    # File name configuration
+    model_suffix: str
+    data_suffix: str
+
+    # AutoExperiment flags
+    cover_flag: bool
+    cover_data_flag: bool
+    cover_heu_flag: bool
+    cover_train_flag: bool
+
+    # Data load configuration
+    model_source: str
+    data_source: str
+
+    # SD2 data generation
+    op_per_job: float
+    op_per_mch_min: int
+    op_per_mch_max: int
+    data_size: int
+    data_type: str
+
+    # TestData to Excel
+    sort_flag: bool
+
+    # OR-Tools configuration
+    max_solve_time: int
+
+    # Seed configuration
+    seed_datagen: int
+    seed_train_vali_datagen: int
+    seed_train: int
+    seed_test: int
+
+    # Environment configuration
+    n_j: int
+    n_m: int
+    n_op: int
+    low: int
+    high: int
+
+    # Network configuration
+    fea_j_input_dim: int
+    fea_m_input_dim: int
+    dropout_prob: float
+    num_heads_OAB: List[int]
+    num_heads_MAB: List[int]
+    layer_fea_output_dim: List[int]
+    num_mlp_layers_actor: int
+    hidden_dim_actor: int
+    num_mlp_layers_critic: int
+    hidden_dim_critic: int
+
+    # PPO Algorithm configuration
+    num_envs: int
+    max_updates: int
+    lr: float
+    gamma: float
+    k_epochs: int
+    eps_clip: float
+    vloss_coef: float
+    ploss_coef: float
+    entloss_coef: float
+    tau: float
+    gae_lambda: float
+
+    # Training configuration
+    train_size: str
+    validate_timestep: int
+    reset_env_timestep: int
+    minibatch_size: int
+
+    # Test configuration
+    test_data: List[str]
+    test_mode: bool
+    sample_times: int
+    test_model: List[str]
+    test_method: List[str]
 
 def str2bool(v):
     """
@@ -38,7 +122,7 @@ parser.add_argument('--data_source', type=str, default='SD2', help='Suffix of te
 
 # args for SD2 data generation
 parser.add_argument('--op_per_job', type=float, default=0,
-                    help='Number of operations per job, default 0, means the number equals m')
+                    help='Number of operations per job, default 0, means the number equals m')      # int, not float
 parser.add_argument('--op_per_mch_min', type=int, default=1,
                     help='Minimum number of compatible machines for each operation')
 parser.add_argument('--op_per_mch_max', type=int, default=5,
@@ -112,4 +196,4 @@ parser.add_argument('--sample_times', type=int, default=100, help='Sampling time
 parser.add_argument('--test_model', nargs='+', default=['10x5+mix'], help='List of model for testing')
 parser.add_argument('--test_method', nargs='+', default=[], help='List of heuristic methods for testing')
 
-configs = parser.parse_args()
+configs: MyConfig = parser.parse_args()     # type: ignore

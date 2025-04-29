@@ -1,12 +1,14 @@
 import time
 import os
 from common_utils import *
-from params import configs
-from tqdm import tqdm
+from params import MyConfig, configs
+from tqdm import tqdm                           # type: ignore
 from data_utils import pack_data_from_config
 from model.PPO import PPO_initialize
 from common_utils import setup_seed
 from fjsp_env_same_op_nums import FJSPEnvForSameOpNums
+
+# question: what if the model is trained with various op nums rather than same op nums?
 
 os.environ["CUDA_VISIBLE_DEVICES"] = configs.device_id
 import torch
@@ -33,7 +35,8 @@ def test_greedy_strategy(data_set, model_path, seed):
     ppo.policy.eval()
 
     n_j = data_set[0][0].shape[0]
-    n_op, n_m = data_set[1][0].shape
+    # n_op, n_m = data_set[1][0].shape
+    _, n_m = data_set[1][0].shape
     env = FJSPEnvForSameOpNums(n_j=n_j, n_m=n_m)
 
     for i in tqdm(range(len(data_set[0])), file=sys.stdout, desc="progress", colour='blue'):
@@ -112,7 +115,7 @@ def test_sampling_strategy(data_set, model_path, sample_times, seed):
     return np.array(test_result_list)
 
 
-def main(config, flag_sample):
+def main(config: MyConfig, flag_sample: bool):
     """
         test the trained model following the config and save the results
     :param flag_sample: whether using the sampling strategy
@@ -156,9 +159,9 @@ def main(config, flag_sample):
                     for j in range(5):
                         result = test_greedy_strategy(data[0], model[0], config.seed_test)
                         result_5_times.append(result)
-                    result_5_times = np.array(result_5_times)
+                    result_5_times_np = np.array(result_5_times)
 
-                    save_result = np.mean(result_5_times, axis=0)
+                    save_result: np.ndarray = np.mean(result_5_times_np, axis=0)
                     print("testing results:")
                     print(f"makespan(greedy): ", save_result[:, 0].mean())
                     print(f"time: ", save_result[:, 1].mean())
@@ -174,5 +177,5 @@ def main(config, flag_sample):
 
 
 if __name__ == '__main__':
-    main(configs, False)
+    main(configs, False)        # type: ignore
     # main(configs, True)

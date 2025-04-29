@@ -1,6 +1,6 @@
 from common_utils import *
-from params import configs
-from tqdm import tqdm
+from params import MyConfig, configs
+from tqdm import tqdm                   # type: ignore
 from data_utils import load_data_from_files, CaseGenerator, SD2_instance_generator
 from common_utils import strToSuffix, setup_seed
 from fjsp_env_same_op_nums import FJSPEnvForSameOpNums
@@ -21,7 +21,7 @@ device = torch.device(configs.device)
 
 
 class Trainer:
-    def __init__(self, config):
+    def __init__(self, config: MyConfig):
 
         self.n_j = config.n_j
         self.n_m = config.n_m
@@ -68,7 +68,7 @@ class Trainer:
         if self.data_source == 'SD1':
             self.vali_env = FJSPEnvForVariousOpNums(self.n_j, self.n_m)
         elif self.data_source == 'SD2':
-            self.vali_env = FJSPEnvForSameOpNums(self.n_j, self.n_m)
+            self.vali_env = FJSPEnvForSameOpNums(self.n_j, self.n_m)      # type: ignore
 
         self.vali_env.set_initial_data(vali_data[0], vali_data[1])
 
@@ -209,7 +209,7 @@ class Trainer:
             if self.data_source == 'SD1':
                 case = CaseGenerator(self.n_j, self.n_m, self.op_per_job_min, self.op_per_job_max,
                                      nums_ope=prepare_JobLength, path='./test', flag_doc=False)
-                JobLength, OpPT, _ = case.get_case(i)
+                JobLength, OpPT, _ = case.get_case()
 
             else:
                 JobLength, OpPT, _ = SD2_instance_generator(config=self.config)

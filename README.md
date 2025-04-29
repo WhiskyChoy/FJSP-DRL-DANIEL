@@ -60,7 +60,7 @@ python test_trained_model.py     --data_source SD2     # source of testing insta
                                  --test_data 10x5+mix  # list of instance names for testing
                                  --test_model 10x5+mix # list of model names for testing
                                  --test_mode False     # whether using the sampling strategy
-                                 --sample_times 100    # set the number of sampling times
+                                 --sample_times 100    # set the number of sampling times (not used when test_mode is False; instead, 5 times of greedy strategy will be used)
 ```
 
 ## Cite the paper
