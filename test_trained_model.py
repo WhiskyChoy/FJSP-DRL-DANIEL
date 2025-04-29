@@ -7,6 +7,7 @@ from data_utils import pack_data_from_config
 from model.PPO import PPO_initialize
 from common_utils import setup_seed
 from fjsp_env_same_op_nums import FJSPEnvForSameOpNums
+from typing import List, Optional, Tuple
 
 # question: what if the model is trained with various op nums rather than same op nums?
 
@@ -19,7 +20,10 @@ ppo = PPO_initialize()
 test_time = time.strftime("%Y%m%d_%H%M%S", time.localtime(time.time()))
 
 
-def test_greedy_strategy(data_set, model_path, seed):
+def test_greedy_strategy(data_set: Tuple[List[np.ndarray], List[np.ndarray]],
+                         model_path: str,
+                         seed: int,
+                         idx: Optional[int]):
     """
         test the model on the given data using the greedy strategy
     :param data_set: test data
@@ -39,7 +43,9 @@ def test_greedy_strategy(data_set, model_path, seed):
     _, n_m = data_set[1][0].shape
     env = FJSPEnvForSameOpNums(n_j=n_j, n_m=n_m)
 
-    for i in tqdm(range(len(data_set[0])), file=sys.stdout, desc="progress", colour='blue'):
+    suffix = '' if idx is None else f'({idx})'
+
+    for i in tqdm(range(len(data_set[0])), file=sys.stdout, desc=f"progress{suffix}", colour='blue'):
 
         state = env.set_initial_data([data_set[0][i]], [data_set[1][i]])
         t1 = time.time()
@@ -56,7 +62,8 @@ def test_greedy_strategy(data_set, model_path, seed):
                                    fea_pairs=state.fea_pairs_tensor)  # [1, J, M]
 
             action = greedy_select_action(pi)
-            state, reward, done = env.step(actions=action.cpu().numpy())
+            # state, reward, done = env.step(actions=action.cpu().numpy())
+            state, _, done = env.step(actions=action.cpu().numpy())
             if done:
                 break
         t2 = time.time()
@@ -66,7 +73,11 @@ def test_greedy_strategy(data_set, model_path, seed):
     return np.array(test_result_list)
 
 
-def test_sampling_strategy(data_set, model_path, sample_times, seed):
+def test_sampling_strategy(data_set: Tuple[List[np.ndarray], List[np.ndarray]],
+                           model_path: str,
+                           sample_times: int,
+                           seed: int,
+                           idx: Optional[int]):
     """
         test the model on the given data using the sampling strategy
     :param data_set: test data
@@ -80,16 +91,19 @@ def test_sampling_strategy(data_set, model_path, sample_times, seed):
     ppo.policy.eval()
 
     n_j = data_set[0][0].shape[0]
-    n_op, n_m = data_set[1][0].shape
+    # n_op, n_m = data_set[1][0].shape
+    _, n_m = data_set[1][0].shape
     from fjsp_env_same_op_nums import FJSPEnvForSameOpNums
     env = FJSPEnvForSameOpNums(n_j, n_m)
 
-    for i in tqdm(range(len(data_set[0])), file=sys.stdout, desc="progress", colour='blue'):
+    suffix = '' if idx is None else f'({idx})'
+
+    for i in tqdm(range(len(data_set[0])), file=sys.stdout, desc=f"progress{suffix}", colour='blue'):
         # copy the testing environment
         JobLength_dataset = np.tile(np.expand_dims(data_set[0][i], axis=0), (sample_times, 1))
         OpPT_dataset = np.tile(np.expand_dims(data_set[1][i], axis=0), (sample_times, 1, 1))
 
-        state = env.set_initial_data(JobLength_dataset, OpPT_dataset)
+        state = env.set_initial_data(JobLength_dataset, OpPT_dataset)   # type: ignore
         t1 = time.time()
         while True:
 
@@ -115,11 +129,12 @@ def test_sampling_strategy(data_set, model_path, sample_times, seed):
     return np.array(test_result_list)
 
 
-def main(config: MyConfig, flag_sample: bool):
+def main(config: MyConfig):
     """
         test the trained model following the config and save the results
-    :param flag_sample: whether using the sampling strategy
     """
+    flag_sample = config.use_sample
+
     setup_seed(config.seed_test)
     if not os.path.exists('./test_results'):
         os.makedirs('./test_results')
@@ -157,7 +172,7 @@ def main(config: MyConfig, flag_sample: bool):
                     result_5_times = []
                     # Greedy mode, test 5 times, record average time.
                     for j in range(5):
-                        result = test_greedy_strategy(data[0], model[0], config.seed_test)
+                        result = test_greedy_strategy(data[0], model[0], config.seed_test, j)
                         result_5_times.append(result)
                     result_5_times_np = np.array(result_5_times)
 
@@ -169,7 +184,7 @@ def main(config: MyConfig, flag_sample: bool):
                 else:
                     # Sample mode, test once.
                     print("Test mode: Sample")
-                    save_result = test_sampling_strategy(data[0], model[0], config.sample_times, config.seed_test)
+                    save_result = test_sampling_strategy(data[0], model[0], config.sample_times, config.seed_test, None)
                     print("testing results:")
                     print(f"makespan(sampling): ", save_result[:, 0].mean())
                     print(f"time: ", save_result[:, 1].mean())
@@ -177,5 +192,4 @@ def main(config: MyConfig, flag_sample: bool):
 
 
 if __name__ == '__main__':
-    main(configs, False)        # type: ignore
-    # main(configs, True)
+    main(configs)        # type: ignore

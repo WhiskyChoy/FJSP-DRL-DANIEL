@@ -81,7 +81,7 @@ class MyConfig(argparse.Namespace):
 
     # Test configuration
     test_data: List[str]
-    test_mode: bool
+    use_sample: bool
     sample_times: int
     test_model: List[str]
     test_method: List[str]
@@ -196,7 +196,7 @@ parser.add_argument('--minibatch_size', type=int, default=1024, help='Batch size
 
 # args for test
 parser.add_argument('--test_data', nargs='+', default=['10x5+mix'], help='List of data for testing')
-parser.add_argument('--test_mode', type=str2bool, default=False, help='Whether using the sampling strategy in testing')
+parser.add_argument('--use_sample', type=str2bool, default=False, help='Whether using the sampling strategy in testing')
 parser.add_argument('--sample_times', type=int, default=100, help='Sampling times for the sampling strategy')
 parser.add_argument('--test_model', nargs='+', default=['10x5+mix'], help='List of model for testing')
 parser.add_argument('--test_method', nargs='+', default=[], help='List of heuristic methods for testing')

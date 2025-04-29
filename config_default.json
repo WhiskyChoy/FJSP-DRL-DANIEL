@@ -62,7 +62,7 @@
     "test_data": [
         "10x5+mix"
     ],
-    "test_mode": false,
+    "use_sample": false,
     "sample_times": 100,
     "test_model": [
         "10x5+mix"

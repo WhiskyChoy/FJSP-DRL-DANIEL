@@ -64,15 +64,15 @@ Note: may use `--use_json_config` to load the params in `config.json` file. Para
 ### Evaluate
 
 ```shell
-python test_trained_model.py # evaluate the model trained on '10x5+mix' of SD2 using the testing instances of the same size using the greedy strategy
+python test_trained_model.py # evaluate the model trained on '10x5+mix' of SD2 using the testing instances of the same size with the greedy strategy
 
 # options (Model files should be prepared in ./trained_network/{model_source})
 python test_trained_model.py     --data_source SD2     # source of testing instances
                                  --model_source SD2    # source of instances that the model trained on 
                                  --test_data 10x5+mix  # list of instance names for testing
                                  --test_model 10x5+mix # list of model names for testing
-                                 --test_mode False     # whether using the sampling strategy
-                                 --sample_times 100    # set the number of sampling times (not used when test_mode is False; instead, 5 times of greedy strategy will be used)
+                                 --use_sample False     # whether using the sampling strategy
+                                 --sample_times 100    # set the number of sampling times (not used when `use_sample` is False; instead, 5 times of greedy strategy will be used)
 ```
 
 Note: may use `--use_json_config` to load the params in `config.json` file. Parameters set by the console will be ignored.

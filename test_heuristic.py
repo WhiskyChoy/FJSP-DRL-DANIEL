@@ -1,17 +1,20 @@
 from common_utils import *
 from params import configs
 from fjsp_env_same_op_nums import FJSPEnvForSameOpNums
-from tqdm import tqdm
+from tqdm import tqdm       # type: ignore
 from data_utils import pack_data_from_config
 import time
 import numpy as np
 import sys
 import os
+from typing import List, Tuple
 
 os.environ["CUDA_VISIBLE_DEVICES"] = configs.device_id
 
 
-def test_heuristic_method(data_set, heuristic, seed):
+def test_heuristic_method(data_set: Tuple[List[np.ndarray], List[np.ndarray]],
+                          heuristic: str,
+                          seed: int):
     """
         test one heuristic method on the given data
     :param data_set:  test data
