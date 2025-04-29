@@ -5,6 +5,7 @@ import copy
 from params import configs
 import sys
 import torch
+from typing import List
 
 
 @dataclass
@@ -12,19 +13,26 @@ class EnvState:
     """
         state definition
     """
-    fea_j_tensor: torch.Tensor = None
-    op_mask_tensor: torch.Tensor = None
-    fea_m_tensor: torch.Tensor = None
-    mch_mask_tensor: torch.Tensor = None
-    dynamic_pair_mask_tensor: torch.Tensor = None
-    comp_idx_tensor: torch.Tensor = None
-    candidate_tensor: torch.Tensor = None
-    fea_pairs_tensor: torch.Tensor = None
+    fea_j_tensor: torch.Tensor = None                           # type: ignore
+    op_mask_tensor: torch.Tensor = None                         # type: ignore
+    fea_m_tensor: torch.Tensor = None                           # type: ignore
+    mch_mask_tensor: torch.Tensor = None                        # type: ignore
+    dynamic_pair_mask_tensor: torch.Tensor = None               # type: ignore
+    comp_idx_tensor: torch.Tensor = None                        # type: ignore
+    candidate_tensor: torch.Tensor = None                       # type: ignore
+    fea_pairs_tensor: torch.Tensor = None                       # type: ignore
 
     device = torch.device(configs.device)
 
-    def update(self, fea_j, op_mask, fea_m, mch_mask, dynamic_pair_mask,
-               comp_idx, candidate, fea_pairs):
+    def update(self,
+               fea_j: np.ndarray,
+               op_mask: np.ndarray,
+               fea_m: np.ndarray,
+               mch_mask: np.ndarray,
+               dynamic_pair_mask: np.ndarray,
+               comp_idx: np.ndarray,
+               candidate: np.ndarray,
+               fea_pairs: np.ndarray):
         """
             update the state information
         :param fea_j: input operation feature vectors with shape [sz_b, N, 10]
@@ -91,7 +99,7 @@ class FJSPEnvForSameOpNums:
         fea_pairs: pair features with shape [sz_b, J, M, 8]
     """
 
-    def __init__(self, n_j, n_m):
+    def __init__(self, n_j: int, n_m: int):
         """
         :param n_j: the number of jobs
         :param n_m: the number of machines
@@ -116,7 +124,7 @@ class FJSPEnvForSameOpNums:
         self.env_job_idx = self.env_idxs.repeat(self.number_of_jobs).reshape(self.number_of_envs, self.number_of_jobs)
         self.op_idx = np.arange(self.number_of_ops)[np.newaxis, :]
 
-    def set_initial_data(self, job_length_list, op_pt_list):
+    def set_initial_data(self, job_length_list: List[np.ndarray], op_pt_list: List[np.ndarray]):
         """
             initialize the data of the instances
 
@@ -312,7 +320,7 @@ class FJSPEnvForSameOpNums:
         self.deleted_op_nodes = np.full(shape=(self.number_of_envs, self.number_of_ops),
                                         fill_value=0, dtype=bool)
 
-    def step(self, actions):
+    def step(self, actions: np.ndarray):
         """
             perform the state transition & return the next state and reward
         :param actions: the action list with shape [E]
@@ -602,7 +610,7 @@ class FJSPEnvForSameOpNums:
         object_mask[:, 1:, 0] = self.deleted_op_nodes[:, :-1]
         self.op_mask = np.logical_or(object_mask, self.op_mask).astype(np.float32)
 
-    def logic_operator(self, x, flagT=True):
+    def logic_operator(self, x: np.ndarray, flagT: bool = True):
         """
             a customized operator for computing some masks
         :param x: a 3-d array with shape [s,a,b]

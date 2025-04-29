@@ -2,16 +2,18 @@ from ortools.sat.python import cp_model
 import numpy as np
 import time
 import os
-from tqdm import tqdm
+from tqdm import tqdm        # type: ignore
 import sys
 from params import configs
 from data_utils import pack_data_from_config
 import collections
+from params import MyConfig
+from typing import List, Tuple
 
 os.environ["CUDA_VISIBLE_DEVICES"] = configs.device_id
 
 
-def solve_instances(config):
+def solve_instances(config: MyConfig):
     """
         Solve 'test_data' from 'data_source' using OR-Tools
         with time limits 'max_solve_time' for each instance,
@@ -70,7 +72,7 @@ def solve_instances(config):
             print("successfully save results...")
 
 
-def matrix_to_the_format_for_solving(job_length, op_pt):
+def matrix_to_the_format_for_solving(job_length: np.ndarray, op_pt: np.ndarray):
     """
         Convert matrix form of the data into the format needed by OR-Tools
     :param job_length: the number of operations in each job (shape [J])
@@ -79,7 +81,8 @@ def matrix_to_the_format_for_solving(job_length, op_pt):
                 on the jth machine or 0 if $O_i$ can not process on $M_j$
     :return:
     """
-    num_ops, num_machines = op_pt.shape
+    # num_ops, num_machines = op_pt.shape
+    _, num_machines = op_pt.shape
     num_jobs = job_length.shape[0]
     jobs = []
     op_idx = 0
@@ -94,7 +97,7 @@ def matrix_to_the_format_for_solving(job_length, op_pt):
     return jobs, num_machines
 
 
-def fjsp_solver(jobs, num_machines, time_limits):
+def fjsp_solver(jobs: List[List[List[Tuple[int, int]]]], num_machines: int, time_limits: float)->Tuple[float, float]:
     """
         solve a fjsp instance by OR-Tools
         (imported from https://github.com/google/or-tools/blob/master/examples/python/flexible_job_shop_sat.py)
@@ -222,16 +225,16 @@ def fjsp_solver(jobs, num_machines, time_limits):
 
     # Makespan objective
     makespan = model.NewIntVar(0, horizon, 'makespan')
-    model.AddMaxEquality(makespan, job_ends)
+    model.AddMaxEquality(makespan, job_ends)    # type: ignore
     model.Minimize(makespan)
 
     # Solve model.
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = time_limits
-    solution_printer = SolutionPrinter()
+    # solution_printer = SolutionPrinter()
 
     total1 = time.time()
-    status = solver.Solve(model, solution_printer)
+    # status = solver.Solve(model, solution_printer)
     total2 = time.time()
 
     return solver.ObjectiveValue(), total2 - total1

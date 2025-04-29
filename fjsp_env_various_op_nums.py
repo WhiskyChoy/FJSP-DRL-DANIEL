@@ -3,6 +3,7 @@ import numpy.ma as ma
 import copy
 import sys
 from fjsp_env_same_op_nums import EnvState
+from typing import List
 
 
 class FJSPEnvForVariousOpNums:
@@ -42,7 +43,7 @@ class FJSPEnvForVariousOpNums:
 
         self.flag_exist_dummy_node = ~(self.env_number_of_ops == self.max_number_of_ops).all()
 
-    def set_initial_data(self, job_length_list, op_pt_list):
+    def set_initial_data(self, job_length_list: List[np.ndarray], op_pt_list: List[np.ndarray]):
         self.number_of_envs = len(job_length_list)
         self.job_length = np.array(job_length_list)
         self.number_of_machines = op_pt_list[0].shape[1]
@@ -221,7 +222,7 @@ class FJSPEnvForVariousOpNums:
         self.delete_mask_fea_j = np.full(shape=(self.number_of_envs, self.max_number_of_ops, self.op_fea_dim),
                                          fill_value=0, dtype=bool)
 
-    def step(self, actions):
+    def step(self, actions: np.ndarray):
         self.incomplete_env_idx = np.where(self.done_flag == 0)[0]
         self.number_of_incomplete_envs = int(self.number_of_envs - np.sum(self.done_flag))
         chosen_job = actions // self.number_of_machines
@@ -380,7 +381,7 @@ class FJSPEnvForVariousOpNums:
 
         self.norm_operation_features(mask=mask_all)
 
-    def norm_operation_features(self, mask):
+    def norm_operation_features(self, mask: np.ndarray):
         self.fea_j[mask] = 0
         num_delete_nodes = np.count_nonzero(mask[:, :, 0], axis=1)
 
@@ -491,7 +492,7 @@ class FJSPEnvForVariousOpNums:
         object_mask[:, 1:, 0] = self.deleted_op_nodes[:, :-1]
         self.op_mask = np.logical_or(object_mask, self.op_mask).astype(np.float32)
 
-    def logic_operator(self, x, flagT=True):
+    def logic_operator(self, x: np.ndarray, flagT: bool = True):
         if flagT:
             x = x.transpose(0, 2, 1)
         d1 = np.expand_dims(x, 2)

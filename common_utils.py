@@ -1,18 +1,26 @@
 import json
 import random
 
+from torch import Tensor
 from torch.distributions.categorical import Categorical
 import sys
 import numpy as np
 import torch
 import copy
+from typing import Tuple
+from fjsp_env_same_op_nums import FJSPEnvForSameOpNums
+from fjsp_env_various_op_nums import FJSPEnvForVariousOpNums
+from typing import Union
+from argparse import Namespace
+
+EnvType = Union[FJSPEnvForVariousOpNums, FJSPEnvForSameOpNums]
 
 """
     agent utils
 """
 
 
-def sample_action(p):
+def sample_action(p: Tensor) -> Tuple[Tensor, Tensor]:
     """
         sample an action by the distribution p
     :param p: this distribution with the probability of choosing each action
@@ -23,7 +31,7 @@ def sample_action(p):
     return s, dist.log_prob(s)
 
 
-def eval_actions(p, actions):
+def eval_actions(p: Tensor, actions: Tensor) -> Tuple[Tensor, Tensor]:
     """
     :param p: the policy
     :param actions: action sequences
@@ -35,22 +43,23 @@ def eval_actions(p, actions):
     return ret, entropy
 
 
-def greedy_select_action(p):
+def greedy_select_action(p: Tensor):
     _, index = torch.max(p, dim=1)
     return index
 
 
-def min_element_index(array):
+def min_element_index(array: np.ndarray):
     """
     :param array: an array with numbers
     :return: Index set corresponding to the minimum element of the array
+    (not argmin, since there may be multiple minimum elements)
     """
     min_element = np.min(array)
     candidate = np.where(array == min_element)
     return candidate
 
 
-def max_element_index(array):
+def max_element_index(array: np.ndarray):
     """
     :param array: an array with numbers
     :return: Index set corresponding to the maximum element of the array
@@ -60,7 +69,7 @@ def max_element_index(array):
     return candidate
 
 
-def available_mch_list_for_job(chosen_job, env):
+def available_mch_list_for_job(chosen_job: int, env: EnvType)->np.ndarray:
     """
     :param chosen_job: the selected job
     :param env: the production environment
@@ -84,7 +93,7 @@ def available_mch_list_for_job(chosen_job, env):
     return chosen_mch_list
 
 
-def heuristic_select_action(method, env):
+def heuristic_select_action(method: str, env: EnvType)->int:
     """
     :param method: the name of heuristic method
     :param env: the environment
@@ -167,18 +176,21 @@ def heuristic_select_action(method, env):
 """
 
 
-def save_default_params(config):
+def save_default_params(config: Namespace):
     """
         save parameters in the config
     :param config: a package of parameters
     :return:
     """
+    config_dict = vars(config)
+    if 'use_json_config' in config_dict:
+        del config_dict['use_json_config']
     with open('./config_default.json', 'wt') as f:
         json.dump(vars(config), f, indent=4)
     print("successfully save default params")
 
 
-def nonzero_averaging(x):
+def nonzero_averaging(x: Tensor) -> Tensor:
     """
         remove zero vectors and then compute the mean of x
         (The deleted nodes are represented by zero vectors)
@@ -193,14 +205,14 @@ def nonzero_averaging(x):
     return torch.mul(p, b)
 
 
-def strToSuffix(str):
-    if str == '':
-        return str
+def strToSuffix(text: str) -> str:
+    if text == '':
+        return text
     else:
-        return '+' + str
+        return '+' + text
 
 
-def setup_seed(seed):
+def setup_seed(seed: int):
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
@@ -211,4 +223,5 @@ def setup_seed(seed):
 
 
 if __name__ == '__main__':
-    print('123')
+    from params import configs
+    save_default_params(config=configs)

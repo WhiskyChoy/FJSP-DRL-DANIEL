@@ -1,9 +1,10 @@
 import argparse
 from typing import List
-
+import json
 
 class MyConfig(argparse.Namespace):
     # Device configuration
+    use_json_config: bool
     device: str
     device_id: str
 
@@ -85,7 +86,7 @@ class MyConfig(argparse.Namespace):
     test_model: List[str]
     test_method: List[str]
 
-def str2bool(v):
+def str2bool(v: str):
     """
         transform string value to bool value
     :param v: a string input
@@ -98,9 +99,13 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Unsupported value encountered.')
 
+with open('./config.json', 'r', encoding='utf-8') as f:
+    json_configs: dict = json.load(f)
 
 parser = argparse.ArgumentParser(description='Arguments for DANIEL_FJSP')
 # args for device
+parser.add_argument('--use_json_config', type=str2bool, default=False,
+                    help='Whether using the default config file')
 parser.add_argument('--device', type=str, default='cuda', help='Device name')
 parser.add_argument('--device_id', type=str, default='0', help='Device id')
 
@@ -197,3 +202,10 @@ parser.add_argument('--test_model', nargs='+', default=['10x5+mix'], help='List 
 parser.add_argument('--test_method', nargs='+', default=[], help='List of heuristic methods for testing')
 
 configs: MyConfig = parser.parse_args()     # type: ignore
+
+if configs.use_json_config:
+    for key, value in json_configs.items():
+        if hasattr(configs, key):
+            setattr(configs, key, value)
+        else:
+            print(f"Warning: {key} is not a valid argument. It will be ignored.")

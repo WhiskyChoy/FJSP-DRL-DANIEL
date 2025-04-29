@@ -1,16 +1,18 @@
+from typing import List
 from params import configs
 import os
 import numpy as np
-import pandas as pd
+import pandas as pd         # type: ignore
 import time as time
 
 null_val = np.nan
 str_time = time.strftime("%Y%m%d_%H%M%S", time.localtime(time.time()))
 non_exist_data = []
-winner = []
+winner = []                # type: ignore
+# the model that performs best on the test data
 
 
-def load_result(source, model_name, data_name):
+def load_result(source: str, model_name: str, data_name: str):
     """
         load the testing results.
     :param source: the source of data
@@ -31,7 +33,7 @@ def load_result(source, model_name, data_name):
         return [], null_val, null_val
 
 
-def load_solution_by_or(source, data_name):
+def load_solution_by_or(source: str, data_name: str):
     """
         load the results solved by OR-Tools
     :param source: the source of data
@@ -53,7 +55,7 @@ def load_solution_by_or(source, data_name):
         return [], null_val, null_val, null_val
 
 
-def load_benchmark_solution(data_name):
+def load_benchmark_solution(data_name: str):
     """
         load the best solutions of benchmark data from files
     :param data_name: the name of benchmark data
@@ -66,7 +68,7 @@ def load_benchmark_solution(data_name):
     return make_span, make_span_mean
 
 
-def print_test_results_to_excel(source, data_list, model_list, file_name=f"test_{str_time}"):
+def print_test_results_to_excel(source: str, data_list: List[str], model_list: List[str], file_name: str= f"test_{str_time}"):
     """
     :param file_name: the name of saved file
     :param source: the source of data
@@ -97,7 +99,8 @@ def print_test_results_to_excel(source, data_list, model_list, file_name=f"test_
         or_time_list.append(or_time)
         or_percentage_list.append(or_percentage)
         if source == 'BenchData':
-            bench_make_span, bench_make_span_mean = load_benchmark_solution(data_name)
+            # bench_make_span, bench_make_span_mean = load_benchmark_solution(data_name)
+            bench_make_span, _ = load_benchmark_solution(data_name)
             optimal_make_span_list.append(bench_make_span)
             if len(or_make_span) == 0:
                 gap = null_val
@@ -174,9 +177,11 @@ def print_test_results_to_excel(source, data_list, model_list, file_name=f"test_
         time_file = time_file.sort_values(by=data_list[0])
 
     # format transform
+    gap_file = gap_file.astype(object)  # Cast to object dtype to allow string assignment
     for i in range(gap_file.shape[0]):
         for j in range(gap_file.shape[1]):
             gap_file.iloc[i, j] = f"{round(gap_file.iloc[i, j], 2)}%"
+            
     # data_save
     make_span_file.to_excel(writer, sheet_name='makespan', index=True)
     gap_file.to_excel(writer, sheet_name='gap', index=True)
