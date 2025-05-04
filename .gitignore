@@ -2,3 +2,4 @@
 **/.vscode
 **/local_*
 **/save
+**/.mypy_cache
