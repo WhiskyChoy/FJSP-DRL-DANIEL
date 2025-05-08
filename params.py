@@ -3,8 +3,10 @@ from typing import List
 import json
 
 class MyConfig(argparse.Namespace):
-    # Device configuration
+    # Global configuration
     use_json_config: bool
+    
+    # Device configuration
     device: str
     device_id: str
 
@@ -85,7 +87,9 @@ class MyConfig(argparse.Namespace):
     sample_times: int
     test_model: List[str]
     test_method: List[str]
-    test_greedy_n_times: int = 5
+    test_greedy_n_times: int
+    test_log_outer_loop: bool
+    test_immediate_save: bool
 
 def str2bool(v: str):
     """
@@ -104,9 +108,12 @@ with open('./config.json', 'r', encoding='utf-8') as f:
     json_configs: dict = json.load(f)
 
 parser = argparse.ArgumentParser(description='Arguments for DANIEL_FJSP')
+
+# args for json config
+parser.add_argument('--use_json_config', type=str2bool, default=True,
+                    help='Whether using the json config file')
+
 # args for device
-parser.add_argument('--use_json_config', type=str2bool, default=False,
-                    help='Whether using the default config file')
 parser.add_argument('--device', type=str, default='cuda', help='Device name')
 parser.add_argument('--device_id', type=str, default='0', help='Device id')
 
@@ -203,6 +210,10 @@ parser.add_argument('--test_model', nargs='+', default=['10x5+mix'], help='List 
 parser.add_argument('--test_method', nargs='+', default=[], help='List of heuristic methods for testing')
 parser.add_argument('--test_greedy_n_times', type=int, default=1,
                     help='Number of times for testing the greedy method (for each instance)')
+parser.add_argument('--test_log_outer_loop', type=str2bool, default=False,
+                    help='Whether to log the outer loop of the test process')
+parser.add_argument('--test_immediate_save', type=str2bool, default=True,
+                    help='Whether saving the test results immediately after testing each instance')
 
 configs: MyConfig = parser.parse_args()     # type: ignore
 

@@ -19,6 +19,12 @@ import torch
 
 device = torch.device(configs.device)
 
+# question: why the number of ops in each job can vary in validation data (e.g. SD1)?
+# answer: because when we select a action, it's actually some job-machine pairs, not operation-machine pairs:
+#         although the feature of some current operation is used, the fact that the indexes for jobs and machines
+#         do not change is the key factor that the decoding for action index is still valid.
+#         (which means that it's not allowed for num_jobs or num_machines to be changed)
+
 
 class Trainer:
     def __init__(self, config: MyConfig):

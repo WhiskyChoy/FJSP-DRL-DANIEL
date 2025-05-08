@@ -78,7 +78,7 @@ def print_test_results_to_excel(source: str, data_list: List[str], model_list: L
     if not os.path.exists(f'./TestDataToExcel/{source}'):
         os.makedirs(f'./TestDataToExcel/{source}')
 
-    idx = np.append('Ortools', model_list)
+    idx = np.append('Ortools', model_list)      # 即使没有也添加?
     columns = data_list
 
     make_span_form = []
@@ -93,7 +93,8 @@ def print_test_results_to_excel(source: str, data_list: List[str], model_list: L
     or_percentage_list = []
 
     # Get Optimal Solution
-    for data_name in data_list:
+    for data_name in data_list:     # 获取or-tools的预求解结果
+        # 如果or-tools的预求解结果不存在，会写入到non_exist_data里(or-tools专属)；全局变量
         or_make_span, or_make_span_mean, or_time, or_percentage = load_solution_by_or(source, data_name)
         or_make_span_list.append(or_make_span_mean)
         or_time_list.append(or_time)

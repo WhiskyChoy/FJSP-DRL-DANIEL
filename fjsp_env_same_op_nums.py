@@ -136,6 +136,7 @@ class FJSPEnvForSameOpNums:
         self.job_length = np.array(job_length_list)
         self.op_pt = np.array(op_pt_list)
         self.number_of_ops = self.op_pt.shape[1]
+        # self.max_number_of_ops = self.number_of_ops         # to keep consistent with `FJSPEnvForDiffOpNums`
         self.number_of_machines = op_pt_list[0].shape[1]
         self.number_of_jobs = job_length_list[0].shape[0]
 

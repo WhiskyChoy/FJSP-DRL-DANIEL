@@ -60,7 +60,7 @@
     "reset_env_timestep": 20,
     "minibatch_size": 1024,
     "test_data": [
-        "homo_huge"
+        "homo_huge_mk"
     ],
     "use_sample": false,
     "sample_times": 100,
@@ -68,5 +68,7 @@
         "10x5+mix"
     ],
     "test_method": [],
-    "test_greedy_n_times": 1
+    "test_greedy_n_times": 1,
+    "test_log_outer_loop": false,
+    "test_immediate_save": true
 }

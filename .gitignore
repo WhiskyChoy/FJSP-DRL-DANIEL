@@ -3,3 +3,5 @@
 **/local_*
 **/save
 **/.mypy_cache
+**/homo_huge*/
+**/TestDataToExcel
