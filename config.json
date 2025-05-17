@@ -60,7 +60,7 @@
     "reset_env_timestep": 20,
     "minibatch_size": 1024,
     "test_data": [
-        "homo_huge_mk"
+        "homo_huge_small_copy"
     ],
     "use_sample": false,
     "sample_times": 100,

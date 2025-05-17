@@ -12,6 +12,28 @@ from fjsp_env_same_op_nums import FJSPEnvForSameOpNums
 from fjsp_env_various_op_nums import FJSPEnvForVariousOpNums
 from typing import Union
 from argparse import Namespace
+import os, psutil, functools, multiprocessing.util as mp_util
+
+# Below it uses some singleton functions to avoid the overhead of creating
+# Since no arguments are passed, there shall be at most one instance in the cache
+@functools.lru_cache(maxsize=None)
+def proc():
+    return psutil.Process(os.getpid())
+
+# Tell Python to wipe the cache in every child
+mp_util.register_after_fork(proc, lambda _: proc.cache_clear())
+
+def get_memory_usage()-> Tuple[float, float]:
+    '''
+    :return: the memory usage of the current process (in MB)
+    rss: Resident Set Size, the non-swapped physical memory a process is using
+    vms: Virtual Memory Size, the total amount of virtual memory used by a process
+    '''
+    process = proc()
+    mem = process.memory_info()
+    rss = mem.rss / (1024 * 1024)  # Convert bytes to MB
+    vms = mem.vms / (1024 * 1024)  # Convert bytes to MB
+    return rss, vms
 
 EnvType = Union[FJSPEnvForVariousOpNums, FJSPEnvForSameOpNums]
 
