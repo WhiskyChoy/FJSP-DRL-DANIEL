@@ -130,7 +130,9 @@ def text_to_matrix(text: List[str])->Tuple[np.ndarray, np.ndarray]:
     return job_length, op_pt_np
 
 
-def load_data_from_files(directory: str)->Tuple[List[np.ndarray], List[np.ndarray]]:
+def load_data_from_files(directory: str,
+                         full_sort: bool = True,
+                         )->Tuple[List[np.ndarray], List[np.ndarray]]:
     """
         load all files within the specified directory
     :param directory: the directory of files
@@ -144,8 +146,11 @@ def load_data_from_files(directory: str)->Tuple[List[np.ndarray], List[np.ndarra
     # for root, dirs, files in os.walk(directory):
     for root, _, files in os.walk(directory):
         # sort files by index
-        files.sort(key=lambda s: int(re.findall("\d+", s)[0]))
-        files.sort(key=lambda s: int(re.findall("\d+", s)[-1]))
+        if full_sort:
+            files.sort(key=lambda s: tuple(int(x) for x in re.findall("\d+", s)))   # sort by all numbers (compatible to the original mode below)
+        else:
+            files.sort(key=lambda s: int(re.findall("\d+", s)[0]))      # sort by the first number
+            files.sort(key=lambda s: int(re.findall("\d+", s)[-1]))     # sort by the last number
         for f in files:
             # print(f)
             g = open(os.path.join(root, f), 'r').readlines()
